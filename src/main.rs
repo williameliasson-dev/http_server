@@ -4,25 +4,7 @@ use std::{
     net::{TcpListener, TcpStream},
 };
 
-struct Response {
-    status: String,
-    content: String,
-    length: usize,
-}
-
-impl Response {
-    fn to_bytes(&self) -> Vec<u8> {
-        let response_status = &self.status;
-        let response_length = &self.length;
-        let response_content = &self.content;
-
-        let response = format!(
-            "{response_status}\r\nContent-Length: {response_length}\r\n\r\n{response_content}"
-        );
-
-        response.into_bytes()
-    }
-}
+mod http;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -36,10 +18,10 @@ fn main() {
 
 fn not_found() -> Vec<u8> {
     let response_content = fs::read_to_string("404.html").unwrap();
-    let response = Response {
+    let response = http::Response {
         content: response_content.to_owned(),
         length: response_content.len(),
-        status: "HTTP/1.1 404 NOT FOUND".to_owned(),
+        status_code: http::StatusCode::PageNotFound,
     };
 
     return response.to_bytes();
@@ -76,10 +58,10 @@ fn handle_get_request(uri: String) -> Vec<u8> {
     match uri.as_str() {
         "/" => {
             let response_content = fs::read_to_string("index.html").unwrap();
-            let response = Response {
+            let response = http::Response {
                 content: response_content.to_owned(),
                 length: response_content.len(),
-                status: "HTTP/1.1 200 OK".to_owned(),
+                status_code: http::StatusCode::Ok,
             };
 
             return response.to_bytes();
