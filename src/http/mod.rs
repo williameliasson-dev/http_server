@@ -9,7 +9,7 @@ pub enum StatusCode {
     Ok,
 }
 
-fn status_code_to_string(status_code: StatusCode) -> String {
+fn status_code_to_string(status_code: &StatusCode) -> String {
     return match status_code {
         StatusCode::PageNotFound => String::from("404 NOT FOUND"),
         StatusCode::Ok => String::from("200 OK"),
@@ -18,7 +18,7 @@ fn status_code_to_string(status_code: StatusCode) -> String {
 
 impl Response {
     pub fn to_bytes(&self) -> Vec<u8> {
-        let response_status = status_code_to_string(self.status_code);
+        let response_status = status_code_to_string(&self.status_code);
         let response_length = &self.length;
         let response_content = &self.content;
 
